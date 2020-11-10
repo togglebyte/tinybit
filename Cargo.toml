@@ -1,0 +1,12 @@
+[package]
+name = "florp-engine"
+version = "0.1.0"
+authors = ["Togglebit <me@togglebit.io>"]
+edition = "2018"
+description = "terminal game framework"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+euclid = "0.22.1"
+crossterm = "0.18.2"
