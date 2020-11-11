@@ -1,6 +1,6 @@
 use std::mem::swap;
 
-use crate::{Camera, CharBuf, Pixel, ScreenPos, ScreenSize, WorldPos};
+use crate::{CharBuf, Pixel, ScreenPos, ScreenSize};
 
 /// Represents a drawable area on screen.
 pub struct Viewport {
@@ -29,7 +29,7 @@ impl Viewport {
     /// Draw the pixels onto the renderable surface layers.
     /// This is offset by the camera and the viewport.
     pub fn draw_pixels(&mut self, pixels: Vec<Pixel>) {
-        let screen_pixels = pixels
+        pixels
             .iter()
             // .filter(|ent| camera.bounding_box.contains(ent.1))
             .for_each(|pixel| {

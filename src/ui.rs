@@ -7,7 +7,7 @@ pub struct DebugOutput {
 
 impl DebugOutput {
     pub fn render(&self, viewport: &mut Viewport) {
-        let pixels = self
+        self
             .text
             .chars()
             .enumerate()

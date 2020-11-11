@@ -1,7 +1,7 @@
 use std::io::{self, Stdout, Write};
 
 use crossterm::cursor::{self, MoveTo};
-use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
+use crossterm::event::EnableMouseCapture;
 use crossterm::style::Print;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
 use crossterm::QueueableCommand;

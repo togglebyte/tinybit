@@ -1,8 +1,8 @@
 //! Event handling.
 //!
 //! ```
-//! # use florp_engine::*;
-//! # use florp_engine::events::Event;
+//! # use tinybit::*;
+//! # use tinybit::events::Event;
 //! let fps = 20;
 //! for event in events::events(fps) {
 //!     match event {
@@ -49,8 +49,8 @@ impl Iterator for Events {
 /// Produce events.
 ///
 /// ```
-/// # use florp_engine::*;
-/// # use florp_engine::events::Event;
+/// # use tinybit::*;
+/// # use tinybit::events::Event;
 /// let fps = 20;
 /// for event in events::events(fps) {
 ///     match event {

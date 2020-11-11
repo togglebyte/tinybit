@@ -3,8 +3,8 @@
 ## Example:
 
 ```rust
-use florp_engine::events::{events, Event, KeyCode, KeyEvent};
-use florp_engine::{
+use tinybit::events::{events, Event, KeyCode, KeyEvent};
+use tinybit::{
     term_size, Camera, DebugOutput, Renderer, ScreenPos, ScreenSize, StdoutTarget, Viewport,
     WorldPos, WorldSize,
 };
