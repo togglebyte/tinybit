@@ -112,7 +112,7 @@ mod test {
         pixels: Vec<Pixel>,
     }
 
-    impl RenderTarget for DummyRender {
+    impl RenderTarget for DummyTarget {
         fn render(&mut self, pixels: Vec<Pixel>) {
             self.pixels = pixels;
         }
@@ -127,9 +127,9 @@ mod test {
         let min_y = cam.bounding_box.min_y();
 
         let a = ('A', WorldPos::new(min_x, min_y));
-        let pixels = vec![a];
+        let a = (a.0, cam.to_screen(a.1));
 
-        view.draw(&cam, pixels);
+        view.draw_pixel(a);
         let mut renderer = Renderer::new(DummyTarget { pixels: Vec::new() });
 
         renderer.render(&mut view);

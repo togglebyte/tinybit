@@ -1,9 +1,3 @@
-use std::io::{Stdout, Write};
-
-use crossterm::cursor::MoveTo;
-use crossterm::style::Print;
-use crossterm::QueueableCommand;
-
 use crate::{ScreenPos, Viewport};
 
 /// Useful to log text to screen
@@ -17,14 +11,10 @@ impl DebugOutput {
             .text
             .chars()
             .enumerate()
-            .map(|(index, c)| (c, ScreenPos::new(index as u16, 0)))
-            .collect();
-        viewport.add_to_buffer(pixels);
-
-        // viewport.
-        // let _ = stdout.queue(MoveTo(viewport.position.x, viewport.position.y));
-        // let _ = stdout.queue(Print(&self.text));
-        // let _ = stdout.flush();
+            .for_each(|(index, c)| {
+                let pixel = (c, ScreenPos::new(index as u16, 0));
+                viewport.draw_pixel(pixel);
+            });
     }
 }
 

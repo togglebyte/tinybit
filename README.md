@@ -17,8 +17,8 @@ fn main() {
     let mut viewport = Viewport::new(ScreenPos::new(0, 4), viewport_size);
 
     // Camera
-    let camera_size = WorldSize::new(width / 2, height / 2);
-    let camera_pos = WorldPos::new(width, height);
+    let camera_size = WorldSize::new(width / 2, height / 2); let camera_pos =
+    WorldPos::new(width, height);
     let mut camera = Camera::new(camera_pos, camera_size);
     camera.set_limit(5, 5);
 

@@ -1,5 +1,5 @@
 [package]
-name = "florp-engine"
+name = "tinybit"
 version = "0.1.0"
 authors = ["Togglebit <me@togglebit.io>"]
 edition = "2018"

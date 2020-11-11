@@ -1,4 +1,4 @@
-use crate::{ScreenPos, ScreenSize};
+use crate::{ScreenPos, ScreenSize, Pixel};
 
 /// Character buffer holds all the "pixels" to be drawn on the screen
 #[derive(Debug)]
@@ -36,13 +36,13 @@ impl CharBuf {
         }
     }
 
-    pub(crate) fn set_pixel(&mut self, pos: ScreenPos, pixel: char) {
-        let index = (self.size.width * pos.y + pos.x) as usize;
-        if let Some(Some(existing_pixel)) = self.chars.get(index) {
-            if *existing_pixel == pixel {
+    pub(crate) fn set_pixel(&mut self, pixel: Pixel) {
+        let index = (self.size.width * pixel.1.y + pixel.1.x) as usize;
+        if let Some(Some(character)) = self.chars.get(index) {
+            if *character == pixel.0 {
                 return;
             }
         }
-        self.chars[index] = Some(pixel);
+        self.chars[index] = Some(pixel.0);
     }
 }

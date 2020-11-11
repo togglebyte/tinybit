@@ -28,24 +28,21 @@ impl Viewport {
 
     /// Draw the pixels onto the renderable surface layers.
     /// This is offset by the camera and the viewport.
-    pub fn draw(&mut self, camera: &Camera, pixels: Vec<(char, WorldPos)>) {
+    pub fn draw_pixels(&mut self, pixels: Vec<Pixel>) {
         let screen_pixels = pixels
             .iter()
-            .filter(|ent| camera.bounding_box.contains(ent.1))
-            .map(|ent| {
-                let pos = camera.to_screen(ent.1);
-                (ent.0, pos)
-            }).collect();
-
-        self.add_to_buffer(screen_pixels);
+            // .filter(|ent| camera.bounding_box.contains(ent.1))
+            .for_each(|pixel| {
+                // let pos = camera.to_screen(ent.1);
+                // let pixel = (ent.0, pos);
+                self.draw_pixel(*pixel);
+            });
     }
 
-    pub(crate) fn add_to_buffer(&mut self, pixels: Vec<Pixel>) {
-        pixels.into_iter().for_each(|(c, pos)| {
-            if self.in_view(pos) {
-                self.new_buf.set_pixel(pos, c);
-            }
-        });
+    pub fn draw_pixel(&mut self, pixel: Pixel) {
+        if self.in_view(pixel.1) {
+            self.new_buf.set_pixel(pixel);
+        }
     }
 
     fn in_view(&self, pos: ScreenPos) -> bool {
@@ -115,14 +112,20 @@ mod test {
         let min_y = cam.bounding_box.min_y();
         let max_y = cam.bounding_box.max_y();
 
-        let a = ('A', WorldPos::new(min_x, min_y));
-        let b = ('B', WorldPos::new(max_x - 1, min_y));
-        let c = ('C', WorldPos::new(min_x, max_y - 1));
-        let d = ('D', WorldPos::new(max_x - 1, max_y - 1));
+        let a = WorldPos::new(min_x, min_y);
+        let b = WorldPos::new(max_x - 1, min_y);
+        let c = WorldPos::new(min_x, max_y - 1);
+        let d = WorldPos::new(max_x - 1, max_y - 1);
 
-        let pixels = vec![a, b, c, d];
+        let positions = vec![a, b, c, d];
+        let glyphs = vec!['A', 'B', 'C', 'D'];
+        let pixels = positions
+            .into_iter()
+            .zip(glyphs)
+            .map(|(p, g)| (g, cam.to_screen(p)))
+            .collect::<Vec<_>>();
 
-        view.draw(&cam, pixels);
+        view.draw_pixels(pixels);
 
         let a = ('A', ScreenPos::new(2, 2));
         let b = ('B', ScreenPos::new(7, 2));

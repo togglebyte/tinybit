@@ -119,7 +119,7 @@ mod test {
     }
 
     #[test]
-    fn render_to_camera() {
+    fn world_to_screen_position() {
         let cam = camera();
         let screen_pos = cam.to_screen(cam.bounding_box.origin);
         assert_eq!(screen_pos, ScreenPos::zero());
