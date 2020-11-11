@@ -1,7 +1,13 @@
 use std::io::{self, Stdout, Write};
 
 use crossterm::cursor::{self, MoveTo};
+
+#[cfg(target_os = "windows")]
 use crossterm::event::EnableMouseCapture;
+
+#[cfg(not(target_os = "windows"))]
+use crossterm::event::DisableMouseCapture;
+
 use crossterm::style::Print;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
 use crossterm::QueueableCommand;
@@ -21,7 +27,12 @@ fn raw_mode() -> Result<Stdout> {
     //
     // ! if you want to disable mouse capture, be sure to enable it first,
     // ! or it will crash on windows.
+    #[cfg(target_os = "windows")]
     execute!(stdout, EnableMouseCapture,)?;
+
+    #[cfg(not(target_os = "windows"))]
+    execute!(stdout, DisableMouseCapture,)?;
+
     stdout.execute(cursor::Hide)?;
     stdout.execute(Clear(ClearType::All))?;
     Ok(stdout)

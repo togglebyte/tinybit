@@ -74,6 +74,8 @@ pub use viewport::Viewport;
 // -----------------------------------------------------------------------------
 //     - Euclid -
 // -----------------------------------------------------------------------------
+pub type Vec2D<T> = euclid::default::Vector2D<T>;
+
 /// Constraining units to screen space
 pub struct Screen;
 
