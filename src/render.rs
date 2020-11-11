@@ -1,7 +1,7 @@
 use std::io::{self, Stdout, Write};
 
 use crossterm::cursor::{self, MoveTo};
-use crossterm::event::DisableMouseCapture;
+use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
 use crossterm::style::Print;
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
 use crossterm::QueueableCommand;
@@ -15,7 +15,13 @@ use crate::{Pixel, Viewport};
 fn raw_mode() -> Result<Stdout> {
     enable_raw_mode()?;
     let mut stdout = io::stdout();
-    execute!(stdout, DisableMouseCapture,)?;
+    // we enable mouse capture because:
+    // 1) DisableMouseCapture doesn't work on windows without enabling it first
+    // 2) it allows to add mouse support later if needed
+    //
+    // ! if you want to disable mouse capture, be sure to enable it first,
+    // ! or it will crash on windows.
+    execute!(stdout, EnableMouseCapture,)?;
     stdout.execute(cursor::Hide)?;
     stdout.execute(Clear(ClearType::All))?;
     Ok(stdout)
