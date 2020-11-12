@@ -50,26 +50,46 @@
 //! ```
 
 mod camera;
-mod char_buffer;
+mod pixelbuffer;
 mod render;
 mod ui;
 mod viewport;
 
 pub mod events;
+pub mod widgets;
 
-/// Type alias representing a pixel 
-/// (a character and a position)
-pub type Pixel = (char, ScreenPos);
+/// A character at a position, with a colour
+#[derive(Debug, Copy, Clone)]
+pub struct Pixel {
+    glyph: char,
+    pos: ScreenPos,
+    color: Option<Color>,
+}
+
+impl Pixel {
+    pub fn new(glyph: char, pos: ScreenPos, color: Option<Color>) -> Self {
+        Self {
+            glyph,
+            pos,
+            color,
+        }
+    } 
+
+    pub fn white(c: char, pos: ScreenPos) -> Self {
+        Self::new(c, pos, None)
+    }
+}
 
 // -----------------------------------------------------------------------------
 //     - Reexports -
 // -----------------------------------------------------------------------------
 pub use camera::Camera;
-pub use char_buffer::CharBuf;
+pub use pixelbuffer::PixelBuffer;
 pub use crossterm::terminal::size as term_size;
 pub use render::{Renderer, StdoutTarget};
 pub use ui::DebugOutput;
 pub use viewport::Viewport;
+pub use crossterm::style::Color;
 
 // -----------------------------------------------------------------------------
 //     - Euclid -

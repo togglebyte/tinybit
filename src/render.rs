@@ -83,12 +83,12 @@ impl StdoutTarget {
 
 impl RenderTarget for StdoutTarget {
     fn render(&mut self, pixels: Vec<Pixel>) {
-        for (pixel, pos) in pixels {
+        for pixel in pixels {
             self.stdout
-                .queue(MoveTo(pos.x, pos.y))
+                .queue(MoveTo(pixel.pos.x, pixel.pos.y))
                 .expect("failed to move cursor");
             self.stdout
-                .queue(Print(pixel.to_string()))
+                .queue(Print(pixel.glyph.to_string()))
                 .expect("failed to print");
         }
 

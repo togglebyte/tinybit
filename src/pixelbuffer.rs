@@ -2,20 +2,20 @@ use crate::{ScreenPos, ScreenSize, Pixel};
 
 /// Character buffer holds all the "pixels" to be drawn on the screen
 #[derive(Debug)]
-pub struct CharBuf {
+pub struct PixelBuffer {
     /// Pixels
-    pub chars: Vec<Option<char>>,
+    pub pixels: Vec<Option<Pixel>>,
     size: ScreenSize,
 }
 
-impl CharBuf {
+impl PixelBuffer {
     /// Create a new character buffer.
     /// Should be at least the same size as the viewport it's relative to
     pub fn new(size: ScreenSize) -> Self {
         let cap = (size.width * size.height) as usize;
-        let chars = vec![None; cap];
+        let pixels = vec![None; cap];
         Self {
-            chars,
+            pixels,
             size,
         }
     }
@@ -28,21 +28,21 @@ impl CharBuf {
     }
 
     /// Get the pixel at the given screen position
-    pub fn get_pixel(&self, pos: ScreenPos) -> Option<char> {
+    pub fn get_pixel(&self, pos: ScreenPos) -> Option<Pixel> {
         let index = (self.size.width * pos.y + pos.x) as usize;
-        match self.chars.get(index) {
+        match self.pixels.get(index) {
             Some(c) => *c,
             None => None,
         }
     }
 
     pub(crate) fn set_pixel(&mut self, pixel: Pixel) {
-        let index = (self.size.width * pixel.1.y + pixel.1.x) as usize;
-        if let Some(Some(character)) = self.chars.get(index) {
-            if *character == pixel.0 {
+        let index = (self.size.width * pixel.pos.y + pixel.pos.x) as usize;
+        if let Some(Some(existing_pixel)) = self.pixels.get(index) {
+            if existing_pixel.glyph == pixel.glyph {
                 return;
             }
         }
-        self.chars[index] = Some(pixel.0);
+        self.pixels[index] = Some(pixel);
     }
 }

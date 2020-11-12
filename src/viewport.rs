@@ -1,6 +1,9 @@
 use std::mem::swap;
 
-use crate::{CharBuf, Pixel, ScreenPos, ScreenSize};
+use crossterm::style::Color;
+
+use crate::widgets::Widget;
+use crate::{PixelBuffer, Pixel, ScreenPos, ScreenSize};
 
 /// Represents a drawable area on screen.
 pub struct Viewport {
@@ -11,8 +14,9 @@ pub struct Viewport {
     /// The size of the viewport. Should probably match the size of the camera
     /// that is used with this viewport.
     pub size: ScreenSize,
-    new_buf: CharBuf,
-    old_buf: CharBuf,
+    new_buf: PixelBuffer,
+    old_buf: PixelBuffer,
+    last_color: Option<Color>,
 }
 
 impl Viewport {
@@ -21,28 +25,35 @@ impl Viewport {
         Self {
             position,
             size,
-            new_buf: CharBuf::new(size),
-            old_buf: CharBuf::new(size),
+            new_buf: PixelBuffer::new(size),
+            old_buf: PixelBuffer::new(size),
+            last_color: None,
         }
     }
 
     /// Draw the pixels onto the renderable surface layers.
     /// This is offset by the camera and the viewport.
     pub fn draw_pixels(&mut self, pixels: Vec<Pixel>) {
-        pixels
-            .iter()
-            // .filter(|ent| camera.bounding_box.contains(ent.1))
-            .for_each(|pixel| {
-                // let pos = camera.to_screen(ent.1);
-                // let pixel = (ent.0, pos);
-                self.draw_pixel(*pixel);
-            });
+        pixels.iter().for_each(|pixel| {
+            self.draw_pixel(*pixel);
+        });
     }
 
     pub fn draw_pixel(&mut self, pixel: Pixel) {
-        if self.in_view(pixel.1) {
+        if self.in_view(pixel.pos) {
             self.new_buf.set_pixel(pixel);
         }
+    }
+
+    pub fn draw_widget(&mut self, widget: impl Widget, offset: ScreenPos) {
+        widget
+            .pixels(self.position, self.size)
+            .into_iter()
+            .for_each(|mut p| {
+                p.pos.x += offset.x;
+                p.pos.y += offset.y;
+                self.draw_pixel(p);
+            })
     }
 
     fn in_view(&self, pos: ScreenPos) -> bool {
@@ -58,26 +69,30 @@ impl Viewport {
 
         for (new, old) in self
             .new_buf
-            .chars
+            .pixels
             .iter()
             .enumerate()
-            .zip(&self.old_buf.chars)
+            .zip(&self.old_buf.pixels)
         {
             match (new, old) {
-                ((index, Some(c)), _) => {
+                ((index, Some(pixel)), _) => {
+                    // pixels.push(*c);
+                    // TODO: remove this once confirmed that it works
                     let pos = self.offset(self.new_buf.index_to_coords(index));
-                    pixels.push((*c, pos));
+                    let mut pixel = *pixel;
+                    pixel.pos = pos;
+                    pixels.push(pixel);
                 }
                 ((index, None), Some(_)) => {
                     let pos = self.offset(self.new_buf.index_to_coords(index));
-                    pixels.push((' ', pos));
+                    pixels.push(Pixel::white(' ', pos));
                 }
                 ((_, None), None) => {}
             }
         }
 
         swap(&mut self.new_buf, &mut self.old_buf);
-        self.new_buf.chars.iter_mut().for_each(|opt| {
+        self.new_buf.pixels.iter_mut().for_each(|opt| {
             opt.take();
         });
 

@@ -12,8 +12,8 @@ impl DebugOutput {
             .chars()
             .enumerate()
             .for_each(|(index, c)| {
-                let pixel = (c, ScreenPos::new(index as u16, 0));
-                viewport.draw_pixel(pixel);
+                // let pixel = (c, ScreenPos::new(index as u16, 0));
+                // viewport.draw_pixel(pixel);
             });
     }
 }
