@@ -20,7 +20,6 @@ fn main() {
     let camera_size = WorldSize::new(width / 2, height / 2); let camera_pos =
     WorldPos::new(width, height);
     let mut camera = Camera::new(camera_pos, camera_size);
-    camera.set_limit(5, 5);
 
     // Renderer
     let stdout_renderer = StdoutTarget::new().expect("Failed to enter raw mode");
@@ -32,9 +31,8 @@ fn main() {
     for event in events(20) {
         match event {
             Event::Tick => {
-                let mut pixels = vec![player];
-
-                viewport.draw(&camera, pixels);
+                let pixel = (player.0, camera.to_screen(player.1));
+                viewport.draw_pixel(pixel);
                 let _ = renderer.render(&mut viewport);
             }
             Event::Key(KeyEvent { code: KeyCode::Esc, ..  }) => break,
@@ -46,8 +44,6 @@ fn main() {
                     KeyCode::Down => { player.1.y += 1; }
                     _ => {}
                 }
-
-                // camera.track(player.1); // Add this in to track the player
             }
         }
     }
