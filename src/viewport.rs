@@ -47,7 +47,7 @@ impl Viewport {
 
     pub fn draw_widget(&mut self, widget: impl Widget, offset: ScreenPos) {
         widget
-            .pixels(self.position, self.size)
+            .pixels(self.size)
             .into_iter()
             .for_each(|mut p| {
                 p.pos.x += offset.x;
@@ -105,10 +105,10 @@ mod test {
     use super::*;
     use crate::*;
 
-    fn camera() -> Camera {
+    fn camera(viewport: &Viewport) -> Camera {
         let pos = WorldPos::new(30, 30);
         let size = WorldSize::new(6, 6);
-        Camera::new(pos, size)
+        Camera::from_viewport(pos, viewport)
     }
 
     fn viewport() -> Viewport {
@@ -119,8 +119,8 @@ mod test {
 
     #[test]
     fn draw_corners() {
-        let cam = camera();
         let mut view = viewport();
+        let cam = camera(&view);
 
         let min_x = cam.bounding_box.min_x();
         let max_x = cam.bounding_box.max_x();
@@ -137,15 +137,15 @@ mod test {
         let pixels = positions
             .into_iter()
             .zip(glyphs)
-            .map(|(p, g)| (g, cam.to_screen(p)))
+            .map(|(p, g)| Pixel::new(g, cam.to_screen(p), None))
             .collect::<Vec<_>>();
 
         view.draw_pixels(pixels);
 
-        let a = ('A', ScreenPos::new(2, 2));
-        let b = ('B', ScreenPos::new(7, 2));
-        let c = ('C', ScreenPos::new(2, 7));
-        let d = ('D', ScreenPos::new(7, 7));
+        let a = Pixel::new('A', ScreenPos::new(2, 2), None);
+        let b = Pixel::new('B', ScreenPos::new(7, 2), None);
+        let c = Pixel::new('C', ScreenPos::new(2, 7), None);
+        let d = Pixel::new('D', ScreenPos::new(7, 7), None);
 
         let drawn_pixels = view.pixels();
 

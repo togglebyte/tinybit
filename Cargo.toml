@@ -8,5 +8,7 @@ description = "terminal game framework"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-euclid = "0.22.1"
-crossterm = "0.18.2"
+euclid = { version = "0.22.1", features = ["serde"] }
+crossterm = { version = "0.18.2", features = ["serde"] }
+serde_json = "1.0.59"
+serde = "1.0.117"

@@ -1,4 +1,4 @@
-use crate::{Screen, ScreenPos, WorldPos, WorldRect, WorldSize};
+use crate::{Screen, ScreenPos, WorldPos, WorldRect, WorldSize, Viewport};
 
 /// Camera
 pub struct Camera {
@@ -13,6 +13,12 @@ pub struct Camera {
 impl Camera {
     /// Create a new camera at a specific world position, with a fixed
     /// size.
+    // pub fn from_viewport(position: WorldPos, size: WorldSize) -> Self {
+    pub fn from_viewport(position: WorldPos, viewport: &Viewport) -> Self {
+        let size = WorldSize::new(viewport.size.width as isize, viewport.size.height as isize);
+        Self::new(position, size)
+    }
+
     pub fn new(position: WorldPos, size: WorldSize) -> Self {
         assert!(position.x >= size.width / 2);
         assert!(position.y >= size.height / 2);
@@ -31,12 +37,19 @@ impl Camera {
 
     /// Convert a point to local space.
     pub fn to_screen(&self, pos: WorldPos) -> ScreenPos {
-        let pos = pos.cast_unit::<Screen>();
-        (pos - ScreenPos::new(self.bounding_box.min_x(), self.bounding_box.min_y())).to_point()
+        let min_x = self.bounding_box.min_x();
+        let min_y = self.bounding_box.min_y();
+
+        ScreenPos::new(
+            (pos.x - min_x) as u16,
+            (pos.y - min_y) as u16,
+        )
     }
 
     /// The limit is used for tracking. For more information see `tracking`
     pub fn set_limit(&mut self, width: u16, height: u16) {
+        let width = width as isize;
+        let height = height as isize;
         let origin = self.position - WorldPos::new(width / 2, height / 2);
         self.limit = WorldRect::new(origin.to_point(), WorldSize::new(width, height));
     }

@@ -3,7 +3,7 @@ use crossterm::style::Color;
 use crate::{Pixel, ScreenPos, ScreenSize};
 
 pub trait Widget {
-    fn pixels(&self, offset: ScreenPos, size: ScreenSize) -> Vec<Pixel>;
+    fn pixels(&self, size: ScreenSize) -> Vec<Pixel>;
 }
 
 // -----------------------------------------------------------------------------
@@ -24,12 +24,12 @@ impl From<String> for Text {
 }
 
 impl Widget for Text {
-    fn pixels(&self, offset: ScreenPos, size: ScreenSize) -> Vec<Pixel> {
-        let mut y = 0;
+    fn pixels(&self, size: ScreenSize) -> Vec<Pixel> {
         self.0
-            .chars()
+            .split('\n')
             .enumerate()
-            .map(|(x, c)| Pixel::new(c, ScreenPos::new(x as u16, y), self.1))
+            .flat_map(|(y, line)| line.chars().enumerate().map(move |(x, c)| (y as u16, x as u16, c)))
+            .map(|(y, x, c)| Pixel::new(c, ScreenPos::new(x, y), self.1))
             .collect()
     }
 }
@@ -53,7 +53,7 @@ impl Border {
 }
 
 impl Widget for Border {
-    fn pixels(&self, offset: ScreenPos, size: ScreenSize) -> Vec<Pixel> {
+    fn pixels(&self, size: ScreenSize) -> Vec<Pixel> {
         let chars = self.s.chars().collect::<Vec<_>>();
 
         let left = chars[7];
@@ -69,31 +69,31 @@ impl Widget for Border {
 
         let mut sides = (1..size.height - 1) // Left
             .into_iter()
-            .map(|y| Pixel::new(left, ScreenPos::new(offset.x, y + offset.y), self.color))
+            .map(|y| Pixel::new(left, ScreenPos::new(0, y), self.color))
             .collect::<Vec<_>>();
 
         sides.append(&mut (1..size.height - 1) // Right
             .into_iter()
-            .map(|y| Pixel::new(right, ScreenPos::new(offset.x + size.width - 1, offset.y + y), self.color))
+            .map(|y| Pixel::new(right, ScreenPos::new(0 + size.width - 1, y), self.color))
             .collect::<Vec<_>>());
 
         let mut top = (1..size.width - 1)
             .into_iter()
-            .map(|x| Pixel::new(top, ScreenPos::new(offset.x + x, offset.y), self.color))
+            .map(|x| Pixel::new(top, ScreenPos::new(x, 0), self.color))
             .collect::<Vec<_>>();
 
         top.append(&mut (1..size.width - 1) // Bottom
             .into_iter()
-            .map(|x| Pixel::new(bot, ScreenPos::new(offset.x + x, offset.y + size.height - 1), self.color))
+            .map(|x| Pixel::new(bot, ScreenPos::new(x, size.height - 1), self.color))
             .collect::<Vec<_>>());
 
         top.append(&mut sides);
 
         // Corners
-        top.push(Pixel::new(top_left, offset, self.color));
-        top.push(Pixel::new(top_right, ScreenPos::new(offset.x + size.width - 1, offset.y), self.color));
-        top.push(Pixel::new(bot_right, ScreenPos::new(offset.x + size.width - 1, offset.y + size.height - 1), self.color));
-        top.push(Pixel::new(bot_left, ScreenPos::new(offset.x, offset.y + size.height - 1), self.color));
+        top.push(Pixel::new(top_left, ScreenPos::zero(), self.color));
+        top.push(Pixel::new(top_right, ScreenPos::new(size.width - 1, 0), self.color));
+        top.push(Pixel::new(bot_right, ScreenPos::new(size.width - 1, size.height - 1), self.color));
+        top.push(Pixel::new(bot_left, ScreenPos::new(0, size.height - 1), self.color));
 
         top
     }

@@ -1,6 +1,7 @@
 use std::io::{self, Stdout, Write};
 
 use crossterm::cursor::{self, MoveTo};
+use crossterm::style::{ResetColor, SetForegroundColor};
 
 #[cfg(target_os = "windows")]
 use crossterm::event::EnableMouseCapture;
@@ -13,7 +14,7 @@ use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
 use crossterm::QueueableCommand;
 use crossterm::{execute, ExecutableCommand, Result};
 
-use crate::{Pixel, Viewport};
+use crate::{Color, Pixel, Viewport};
 
 // -----------------------------------------------------------------------------
 //     - Raw mode -
@@ -69,6 +70,7 @@ pub trait RenderTarget {
 /// Render to stdout
 pub struct StdoutTarget {
     stdout: Stdout,
+    last_color: Option<Color>,
 }
 
 impl StdoutTarget {
@@ -77,7 +79,10 @@ impl StdoutTarget {
     /// Once this is dropped it will disable raw mode.
     pub fn new() -> Result<Self> {
         let stdout = raw_mode()?;
-        Ok(Self { stdout })
+        Ok(Self {
+            stdout,
+            last_color: None,
+        })
     }
 }
 
@@ -87,6 +92,15 @@ impl RenderTarget for StdoutTarget {
             self.stdout
                 .queue(MoveTo(pixel.pos.x, pixel.pos.y))
                 .expect("failed to move cursor");
+
+            if self.last_color != pixel.color {
+                self.last_color = pixel.color;
+                let _ = match self.last_color {
+                    Some(color) => self.stdout.queue(SetForegroundColor(color)),
+                    None => self.stdout.queue(ResetColor),
+                };
+            }
+
             self.stdout
                 .queue(Print(pixel.glyph.to_string()))
                 .expect("failed to print");
@@ -138,14 +152,14 @@ mod test {
         let min_y = cam.bounding_box.min_y();
 
         let a = ('A', WorldPos::new(min_x, min_y));
-        let a = (a.0, cam.to_screen(a.1));
+        let a = Pixel::new(a.0, cam.to_screen(a.1), None);
 
         view.draw_pixel(a);
         let mut renderer = Renderer::new(DummyTarget { pixels: Vec::new() });
 
         renderer.render(&mut view);
 
-        let a = ('A', ScreenPos::new(2, 2)); // 2, 2 because of the viewport offset
+        let a = Pixel::new('A', ScreenPos::new(2, 2), None); // 2, 2 because of the viewport offset
         let pixels = vec![a];
         assert_eq!(pixels, renderer.target.pixels);
     }
