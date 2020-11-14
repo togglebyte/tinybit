@@ -3,7 +3,7 @@
 //! ```
 //! # use tinybit::events::{events, Event, KeyCode, KeyEvent};
 //! # use tinybit::{
-//! #     term_size, Camera, DebugOutput, Renderer, ScreenPos, ScreenSize, StdoutTarget, Viewport,
+//! #     term_size, Camera, Renderer, ScreenPos, ScreenSize, StdoutTarget, Viewport,
 //! #     WorldPos, WorldSize, Pixel
 //! # };
 //! 
@@ -55,7 +55,6 @@ use serde::{Serialize, Deserialize};
 mod camera;
 mod pixelbuffer;
 mod render;
-mod ui;
 mod viewport;
 
 pub mod events;
@@ -90,7 +89,6 @@ pub use camera::Camera;
 pub use pixelbuffer::PixelBuffer;
 pub use crossterm::terminal::size as term_size;
 pub use render::{Renderer, StdoutTarget};
-pub use ui::DebugOutput;
 pub use viewport::Viewport;
 pub use crossterm::style::Color;
 

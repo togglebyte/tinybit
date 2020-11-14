@@ -24,7 +24,7 @@ impl From<String> for Text {
 }
 
 impl Widget for Text {
-    fn pixels(&self, size: ScreenSize) -> Vec<Pixel> {
+    fn pixels(&self, _size: ScreenSize) -> Vec<Pixel> {
         self.0
             .split('\n')
             .enumerate()
@@ -39,16 +39,13 @@ impl Widget for Text {
 // -----------------------------------------------------------------------------
 pub struct Border {
     s: String,
-    size: ScreenSize,
     color: Option<Color>,
 }
 
 impl Border {
-    pub fn new(s: String, size: ScreenSize, color: Option<Color>) -> Self {
+    pub fn new(s: String, color: Option<Color>) -> Self {
         debug_assert!(s.chars().count() >= 8);
-        debug_assert!(size.width > 2);
-        debug_assert!(size.height > 2);
-        Self { s, size, color }
+        Self { s, color }
     }
 }
 
@@ -64,8 +61,6 @@ impl Widget for Border {
         let top_right = chars[2];
         let top = chars[1];
         let top_left = chars[0];
-
-        // let mut pixels = Vec::with_capacity(size.width as usize * 2 + size.height as usize * 2);
 
         let mut sides = (1..size.height - 1) // Left
             .into_iter()

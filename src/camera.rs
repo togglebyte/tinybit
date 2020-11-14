@@ -1,4 +1,4 @@
-use crate::{Screen, ScreenPos, WorldPos, WorldRect, WorldSize, Viewport};
+use crate::{ScreenPos, WorldPos, WorldRect, WorldSize, Viewport};
 
 /// Camera
 pub struct Camera {
@@ -144,5 +144,15 @@ mod test {
         let dest = WorldPos::new(100, 100);
         cam.move_to(dest);
         assert_eq!(dest, cam.position);
+    }
+
+    #[test]
+    fn set_limit() {
+        let mut cam = camera();
+        cam.move_to(WorldPos::new(100, 100));
+        cam.set_limit(5, 5);
+        let limit = cam.limit;
+        assert_eq!(limit.size, WorldSize::new(5, 5));
+        assert_eq!(limit.origin, WorldPos::new(100 - 5 / 2, 100 - 5 / 2));
     }
 }

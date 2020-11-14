@@ -1,7 +1,5 @@
 use std::mem::swap;
 
-use crossterm::style::Color;
-
 use crate::widgets::Widget;
 use crate::{PixelBuffer, Pixel, ScreenPos, ScreenSize};
 
@@ -16,7 +14,6 @@ pub struct Viewport {
     pub size: ScreenSize,
     new_buf: PixelBuffer,
     old_buf: PixelBuffer,
-    last_color: Option<Color>,
 }
 
 impl Viewport {
@@ -27,7 +24,6 @@ impl Viewport {
             size,
             new_buf: PixelBuffer::new(size),
             old_buf: PixelBuffer::new(size),
-            last_color: None,
         }
     }
 
@@ -107,7 +103,6 @@ mod test {
 
     fn camera(viewport: &Viewport) -> Camera {
         let pos = WorldPos::new(30, 30);
-        let size = WorldSize::new(6, 6);
         Camera::from_viewport(pos, viewport)
     }
 
