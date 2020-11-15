@@ -1,4 +1,12 @@
-use crate::{ScreenPos, WorldPos, WorldRect, WorldSize, Viewport};
+use crate::{ScreenPos, Viewport, World, WorldPos, WorldRect, WorldSize};
+use euclid::Vector2D;
+
+struct Limit {
+    top: isize,
+    right: isize,
+    bottom: isize,
+    left: isize,
+}
 
 /// Camera
 pub struct Camera {
@@ -7,7 +15,7 @@ pub struct Camera {
 
     size: WorldSize,
     pub(crate) bounding_box: WorldRect,
-    limit: WorldRect,
+    limit: Option<Limit>,
 }
 
 impl Camera {
@@ -31,7 +39,7 @@ impl Camera {
             position,
             size,
             bounding_box,
-            limit: bounding_box,
+            limit: None,
         }
     }
 
@@ -40,22 +48,34 @@ impl Camera {
         let min_x = self.bounding_box.min_x();
         let min_y = self.bounding_box.min_y();
 
-        ScreenPos::new(
-            (pos.x - min_x) as u16,
-            (pos.y - min_y) as u16,
-        )
+        ScreenPos::new((pos.x - min_x) as u16, (pos.y - min_y) as u16)
     }
 
-    /// The limit is used for tracking. For more information see `tracking`
-    pub fn set_limit(&mut self, width: u16, height: u16) {
-        let width = width as isize;
-        let height = height as isize;
-        let origin = self.position - WorldPos::new(width / 2, height / 2);
-        self.limit = WorldRect::new(origin.to_point(), WorldSize::new(width, height));
+    /// The limit is used for tracking. For more information see `tracking`.
+    /// given a limit of 1, 1, 1, 1, `c` represents the centre:
+    ///
+    /// ```text
+    /// [ ] [ ] [ ] [ ] [ ]
+    /// [ ] [x] [x] [x] [ ]
+    /// [ ] [x] [c] [x] [ ]
+    /// [ ] [x] [x] [x] [ ]
+    /// [ ] [ ] [ ] [ ] [ ]
+    /// ```
+    pub fn set_limit(&mut self, top: u16, right: u16, bottom: u16, left: u16) {
+        self.limit = Some(Limit {
+            top: top as isize,
+            right: right as isize,
+            bottom: bottom as isize,
+            left: left as isize,
+        });
     }
 
     /// Move the camera to a new position in global space
     pub fn move_to(&mut self, new_pos: WorldPos) {
+        if new_pos == self.position {
+            return;
+        }
+
         self.position = new_pos;
 
         // Bounding box
@@ -66,58 +86,32 @@ impl Camera {
             ),
             self.size,
         );
-
-        // Move limit
-        self.limit = WorldRect::new(
-            WorldPos::new(
-                self.position.x.saturating_sub(self.limit.size.width / 2),
-                self.position.y.saturating_sub(self.limit.size.height / 2),
-            ),
-            self.limit.size,
-        );
     }
 
     /// Move the camera if the target is outside of the camera's `limit` box
     pub fn track(&mut self, pos: WorldPos) {
-        let x = if pos.x < self.limit.min_x() {
-            let min = self.position.x + self.size.width;
-            let val = pos
-                .x
-                .saturating_add(self.limit.min_x() + self.limit.size.width - 1);
-            min.max(val)
-        } else if pos.x > self.limit.max_x() {
-            pos.x
-                .saturating_add(self.limit.max_x() - self.limit.size.width - 1)
+        let limit = match self.limit {
+            Some(ref l) => l,
+            None => return,
+        };
+
+        let x = if pos.x >= self.position.x + limit.left {
+            pos.x - limit.left
+        } else if pos.x <= self.position.x - limit.right {
+            pos.x + limit.right
         } else {
             self.position.x
         };
 
-        let y = if pos.y < self.limit.min_y() {
-            let min = self.position.y + self.size.height;
-            let val = pos
-                .y
-                .saturating_add(self.limit.min_y() + self.limit.size.height - 1);
-            min.max(val)
-        } else if pos.y > self.limit.max_y() {
-            pos.y
-                .saturating_add(self.limit.max_y() - self.limit.size.height - 1)
+        let y = if pos.y >= self.position.y + limit.top {
+            pos.y - limit.top
+        } else if pos.y <= self.position.y - limit.bottom {
+            pos.y + limit.bottom
         } else {
             self.position.y
         };
 
-        let mut new_pos = WorldPos::new(
-            x.saturating_sub(self.position.x),
-            y.saturating_sub(self.position.y),
-        );
-
-        if new_pos.x == 0 {
-            new_pos.x = self.position.x;
-        }
-        if new_pos.y == 0 {
-            new_pos.y = self.position.y;
-        }
-
-        self.move_to(new_pos);
+        self.move_to(WorldPos::new(x, y));
     }
 }
 
@@ -147,12 +141,39 @@ mod test {
     }
 
     #[test]
-    fn set_limit() {
+    fn track_point() {
         let mut cam = camera();
         cam.move_to(WorldPos::new(100, 100));
-        cam.set_limit(5, 5);
-        let limit = cam.limit;
-        assert_eq!(limit.size, WorldSize::new(5, 5));
-        assert_eq!(limit.origin, WorldPos::new(100 - 5 / 2, 100 - 5 / 2));
+        cam.set_limit(2, 2, 2, 2);
+
+        let cam_pos = cam.position;
+
+        cam.track(WorldPos::new(102, 98));
+        assert_eq!(cam_pos, cam.position);
+
+        // Don't move
+        cam.move_to(WorldPos::new(100, 100));
+        cam.track(WorldPos::new(100, 100));
+        assert_eq!(WorldPos::new(100, 100), cam.position);
+
+        // Move left
+        cam.move_to(WorldPos::new(100, 100));
+        cam.track(WorldPos::new(97, 98));
+        assert_eq!(WorldPos::new(99, 100), cam.position);
+
+        // Move right
+        cam.move_to(WorldPos::new(100, 100));
+        cam.track(WorldPos::new(103, 100));
+        assert_eq!(WorldPos::new(101, 100), cam.position);
+
+        // Move up
+        cam.move_to(WorldPos::new(100, 100));
+        cam.track(WorldPos::new(100, 103));
+        assert_eq!(WorldPos::new(100, 101), cam.position);
+
+        // Move down
+        cam.move_to(WorldPos::new(100, 100));
+        cam.track(WorldPos::new(100, 97));
+        assert_eq!(WorldPos::new(100, 99), cam.position);
     }
 }
