@@ -45,6 +45,7 @@ fn main() {
                     _ => {}
                 }
             }
+            Event::Resize(w, h) => {}
         }
     }
 }

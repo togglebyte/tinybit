@@ -1,7 +1,7 @@
 use std::mem::swap;
 
 use crate::widgets::Widget;
-use crate::{PixelBuffer, Pixel, ScreenPos, ScreenSize};
+use crate::{Pixel, PixelBuffer, ScreenPos, ScreenSize};
 
 /// Represents a drawable area on screen.
 pub struct Viewport {
@@ -27,6 +27,14 @@ impl Viewport {
         }
     }
 
+    /// Resize the viewport
+    pub fn resize(&mut self, width: u16, height: u16) {
+        self.size = ScreenSize::new(width, height);
+        self.new_buf = PixelBuffer::new(self.size);
+        self.old_buf = PixelBuffer::new(self.size);
+        self.new_buf.fill(' ');
+    }
+
     /// Draw the pixels onto the renderable surface layers.
     /// This is offset by the camera and the viewport.
     pub fn draw_pixels(&mut self, pixels: Vec<Pixel>) {
@@ -42,14 +50,11 @@ impl Viewport {
     }
 
     pub fn draw_widget(&mut self, widget: impl Widget, offset: ScreenPos) {
-        widget
-            .pixels(self.size)
-            .into_iter()
-            .for_each(|mut p| {
-                p.pos.x += offset.x;
-                p.pos.y += offset.y;
-                self.draw_pixel(p);
-            })
+        widget.pixels(self.size).into_iter().for_each(|mut p| {
+            p.pos.x += offset.x;
+            p.pos.y += offset.y;
+            self.draw_pixel(p);
+        })
     }
 
     fn in_view(&self, pos: ScreenPos) -> bool {
@@ -72,8 +77,6 @@ impl Viewport {
         {
             match (new, old) {
                 ((index, Some(pixel)), _) => {
-                    // pixels.push(*c);
-                    // TODO: remove this once confirmed that it works
                     let pos = self.offset(self.new_buf.index_to_coords(index));
                     let mut pixel = *pixel;
                     pixel.pos = pos;

@@ -1,5 +1,4 @@
-use crate::{ScreenPos, Viewport, World, WorldPos, WorldRect, WorldSize};
-use euclid::Vector2D;
+use crate::{ScreenPos, Viewport, WorldPos, WorldRect, WorldSize};
 
 struct Limit {
     top: isize,
@@ -27,6 +26,12 @@ impl Camera {
         Self::new(position, size)
     }
 
+    /// Resize the camera
+    pub fn resize(&mut self, width: u16, height: u16) {
+        self.size = WorldSize::new(width as isize, height as isize);
+    }
+
+    /// Create a new camera
     pub fn new(position: WorldPos, size: WorldSize) -> Self {
         assert!(position.x >= size.width / 2);
         assert!(position.y >= size.height / 2);

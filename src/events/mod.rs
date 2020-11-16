@@ -31,6 +31,10 @@ pub enum Event {
 
     /// A key press
     Key(KeyEvent),
+
+
+    /// Terminal resize event
+    Resize(u16, u16),
 }
 
 /// Events producer
@@ -68,8 +72,14 @@ pub fn events(fps: u64) -> Events {
     let tx_clone = tx.clone();
     thread::spawn(move || loop {
         if let Ok(ev) = read() {
-            if let CrossTermEvent::Key(k) = ev {
-                let _ = tx_clone.send(Event::Key(k));
+            match ev {
+                CrossTermEvent::Key(k) => {
+                    let _ = tx_clone.send(Event::Key(k));
+                }
+                CrossTermEvent::Resize(w, h) => {
+                    let _ = tx_clone.send(Event::Resize(w, h));
+                }
+                _ => {}
             }
         }
     });

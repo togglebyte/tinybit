@@ -20,6 +20,15 @@ impl PixelBuffer {
         }
     }
 
+    /// Fill all pixels with a specific glyph.
+    /// Usefull to write empty chars to the buffer.
+    pub fn fill(&mut self, glyph: char) {
+        (0..self.pixels.len()).into_iter().map(|i| {
+            let pos = self.index_to_coords(i);
+            self.set_pixel(Pixel::new(glyph, pos, None));
+        });
+    }
+
     /// Convert index to x y coordinates
     pub fn index_to_coords(&self, index: usize) -> ScreenPos {
         let x = index % self.size.width as usize;

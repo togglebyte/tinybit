@@ -57,6 +57,11 @@ impl<T: RenderTarget> Renderer<T> {
     pub fn render(&mut self, viewport: &mut Viewport) {
         self.target.render(viewport.pixels());
     }
+
+    /// Clear the screen
+    pub fn clear(&mut self) {
+        self.target.clear();
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -65,6 +70,7 @@ impl<T: RenderTarget> Renderer<T> {
 /// Something that a render can render to.
 pub trait RenderTarget {
     fn render(&mut self, pixels: Vec<Pixel>);
+    fn clear(&mut self);
 }
 
 /// Render to stdout
@@ -108,6 +114,10 @@ impl RenderTarget for StdoutTarget {
 
         let _ = self.stdout.flush();
     }
+
+    fn clear(&mut self) {
+        self.stdout.queue(Clear(ClearType::All));
+    }
 }
 
 impl Drop for StdoutTarget {
@@ -141,6 +151,8 @@ mod test {
         fn render(&mut self, pixels: Vec<Pixel>) {
             self.pixels = pixels;
         }
+
+        fn clear(&mut self) {}
     }
 
     #[test]
