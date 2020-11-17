@@ -116,7 +116,7 @@ impl RenderTarget for StdoutTarget {
     }
 
     fn clear(&mut self) {
-        self.stdout.queue(Clear(ClearType::All));
+        let _ = self.stdout.queue(Clear(ClearType::All));
     }
 }
 
@@ -132,8 +132,8 @@ mod test {
     use crate::*;
 
     fn camera() -> Camera {
-        let pos = WorldPos::new(30, 30);
-        let size = WorldSize::new(6, 6);
+        let pos = WorldPos::new(30.0, 30.0);
+        let size = WorldSize::new(6.0, 6.0);
         Camera::new(pos, size)
     }
 

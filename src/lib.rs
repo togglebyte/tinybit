@@ -15,8 +15,8 @@
 //!     let mut viewport = Viewport::new(ScreenPos::new(0, 4), viewport_size);
 //! 
 //!     // Camera
-//!     let (width, height) = (width as isize, height as isize);
-//!     let camera_size = WorldSize::new(width / 2, height / 2); let camera_pos =
+//!     let (width, height) = (width as f32, height as f32);
+//!     let camera_size = WorldSize::new(width / 2.0, height / 2.0); let camera_pos =
 //!     WorldPos::new(width, height);
 //!     let mut camera = Camera::new(camera_pos, camera_size);
 //! 
@@ -38,10 +38,10 @@
 //!             Event::Key(KeyEvent { code: KeyCode::Esc, ..  }) => break,
 //!             Event::Key(KeyEvent { code: kc, .. }) => {
 //!                 match kc {
-//!                     KeyCode::Left => { player.1.x -= 1; }
-//!                     KeyCode::Right => { player.1.x += 1; }
-//!                     KeyCode::Up => { player.1.y -= 1; }
-//!                     KeyCode::Down => { player.1.y += 1; }
+//!                     KeyCode::Left => { player.1.x -= 1.0; }
+//!                     KeyCode::Right => { player.1.x += 1.0; }
+//!                     KeyCode::Up => { player.1.y -= 1.0; }
+//!                     KeyCode::Down => { player.1.y += 1.0; }
 //!                     _ => {}
 //!                 }
 //!             }

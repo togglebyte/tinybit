@@ -123,8 +123,8 @@ mod test {
     use super::*;
 
     fn camera() -> Camera {
-        let pos = WorldPos::new(3, 3);
-        let size = WorldSize::new(6, 6);
+        let pos = WorldPos::new(3.0, 3.0);
+        let size = WorldSize::new(6.0, 6.0);
         Camera::new(pos, size)
     }
 
@@ -138,7 +138,7 @@ mod test {
     #[test]
     fn move_camera() {
         let mut cam = camera();
-        let dest = WorldPos::new(100, 100);
+        let dest = WorldPos::new(100.0, 100.0);
         cam.move_to(dest);
         assert_eq!(dest, cam.position);
     }
@@ -146,37 +146,37 @@ mod test {
     #[test]
     fn track_point() {
         let mut cam = camera();
-        cam.move_to(WorldPos::new(100, 100));
+        cam.move_to(WorldPos::new(100.0, 100.0));
         cam.set_limit(2, 2, 2, 2);
 
         let cam_pos = cam.position;
 
-        cam.track(WorldPos::new(102, 98));
+        cam.track(WorldPos::new(102.0, 98.0));
         assert_eq!(cam_pos, cam.position);
 
         // Don't move
-        cam.move_to(WorldPos::new(100, 100));
-        cam.track(WorldPos::new(100, 100));
-        assert_eq!(WorldPos::new(100, 100), cam.position);
+        cam.move_to(WorldPos::new(100.0, 100.0));
+        cam.track(WorldPos::new(100.0, 100.0));
+        assert_eq!(WorldPos::new(100.0, 100.0), cam.position);
 
         // Move left
-        cam.move_to(WorldPos::new(100, 100));
-        cam.track(WorldPos::new(97, 98));
-        assert_eq!(WorldPos::new(99, 100), cam.position);
+        cam.move_to(WorldPos::new(100.0, 100.0));
+        cam.track(WorldPos::new(97.0, 98.0));
+        assert_eq!(WorldPos::new(99.0, 100.0), cam.position);
 
         // Move right
-        cam.move_to(WorldPos::new(100, 100));
-        cam.track(WorldPos::new(103, 100));
-        assert_eq!(WorldPos::new(101, 100), cam.position);
+        cam.move_to(WorldPos::new(100.0, 100.0));
+        cam.track(WorldPos::new(103.0, 100.0));
+        assert_eq!(WorldPos::new(101.0, 100.0), cam.position);
 
         // Move up
-        cam.move_to(WorldPos::new(100, 100));
-        cam.track(WorldPos::new(100, 103));
-        assert_eq!(WorldPos::new(100, 101), cam.position);
+        cam.move_to(WorldPos::new(100.0, 100.0));
+        cam.track(WorldPos::new(100.0, 103.0));
+        assert_eq!(WorldPos::new(100.0, 101.0), cam.position);
 
         // Move down
-        cam.move_to(WorldPos::new(100, 100));
-        cam.track(WorldPos::new(100, 97));
-        assert_eq!(WorldPos::new(100, 99), cam.position);
+        cam.move_to(WorldPos::new(100.0, 100.0));
+        cam.track(WorldPos::new(100.0, 97.0));
+        assert_eq!(WorldPos::new(100.0, 99.0), cam.position);
     }
 }
