@@ -110,16 +110,16 @@ pub struct World;
 pub type ScreenPos = euclid::Point2D<u16, Screen>;
 
 /// A position in the world
-pub type WorldPos = euclid::Point2D<isize, World>;
+pub type WorldPos = euclid::Point2D<f32, World>;
 
 /// A rect on screen
 pub type ScreenRect = euclid::Rect<u16, Screen>;
 
 /// A rect in the world
-pub type WorldRect = euclid::Rect<isize, World>;
+pub type WorldRect = euclid::Rect<f32, World>;
 
 /// A size on screen
 pub type ScreenSize = euclid::Size2D<u16, Screen>;
 
 /// A size in the world
-pub type WorldSize = euclid::Size2D<isize, World>;
+pub type WorldSize = euclid::Size2D<f32, World>;

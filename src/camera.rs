@@ -1,10 +1,10 @@
 use crate::{ScreenPos, Viewport, WorldPos, WorldRect, WorldSize};
 
 struct Limit {
-    top: isize,
-    right: isize,
-    bottom: isize,
-    left: isize,
+    top: f32,
+    right: f32,
+    bottom: f32,
+    left: f32,
 }
 
 /// Camera
@@ -22,21 +22,19 @@ impl Camera {
     /// size.
     // pub fn from_viewport(position: WorldPos, size: WorldSize) -> Self {
     pub fn from_viewport(position: WorldPos, viewport: &Viewport) -> Self {
-        let size = WorldSize::new(viewport.size.width as isize, viewport.size.height as isize);
+        let size = WorldSize::new(viewport.size.width as f32, viewport.size.height as f32);
         Self::new(position, size)
     }
 
     /// Resize the camera
     pub fn resize(&mut self, width: u16, height: u16) {
-        self.size = WorldSize::new(width as isize, height as isize);
+        self.size = WorldSize::new(width as f32, height as f32);
     }
 
     /// Create a new camera
     pub fn new(position: WorldPos, size: WorldSize) -> Self {
-        assert!(position.x >= size.width / 2);
-        assert!(position.y >= size.height / 2);
         let bounding_box = WorldRect::new(
-            WorldPos::new(position.x - size.width / 2, position.y - size.height / 2),
+            WorldPos::new(position.x - size.width / 2.0, position.y - size.height / 2.0),
             size,
         );
 
@@ -68,10 +66,10 @@ impl Camera {
     /// ```
     pub fn set_limit(&mut self, top: u16, right: u16, bottom: u16, left: u16) {
         self.limit = Some(Limit {
-            top: top as isize,
-            right: right as isize,
-            bottom: bottom as isize,
-            left: left as isize,
+            top: top as f32,
+            right: right as f32,
+            bottom: bottom as f32,
+            left: left as f32,
         });
     }
 
@@ -86,8 +84,8 @@ impl Camera {
         // Bounding box
         self.bounding_box = WorldRect::new(
             WorldPos::new(
-                self.position.x.saturating_sub(self.size.width / 2),
-                self.position.y.saturating_sub(self.size.height / 2),
+                self.position.x - (self.size.width / 2.0),
+                self.position.y - (self.size.height / 2.0),
             ),
             self.size,
         );
