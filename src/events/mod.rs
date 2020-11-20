@@ -25,6 +25,7 @@ type Rx = Receiver<Event>;
 
 /// Event. Either a tick event or a key press event
 /// TODO: add resize event
+#[derive(Debug, Clone, Copy)] 
 pub enum Event {
     /// Generated for every frame
     Tick,

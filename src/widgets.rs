@@ -43,6 +43,17 @@ pub struct Border {
 }
 
 impl Border {
+    /// Create a new border from the chars in `s`, starting
+    /// from the top left corner, going clockwise.
+    ///
+    /// ```text
+    /// // Border::new("ABCDEFGH" None) 
+    ///
+    /// ABBBBBBC
+    /// H      D
+    /// H      D
+    /// GFFFFFFE
+    /// ```
     pub fn new(s: String, color: Option<Color>) -> Self {
         debug_assert!(s.chars().count() >= 8);
         Self { s, color }
