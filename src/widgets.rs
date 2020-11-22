@@ -9,17 +9,17 @@ pub trait Widget {
 // -----------------------------------------------------------------------------
 //     - Text -
 // -----------------------------------------------------------------------------
-pub struct Text(pub String, pub Option<Color>);
+pub struct Text(pub String, pub Option<Color>, pub Option<Color>);
 
 impl Text {
-    pub fn new(s: String, col: Option<Color>) -> Self {
-        Self(s, col)
+    pub fn new(s: String, fg: Option<Color>, bg: Option<Color>) -> Self {
+        Self(s, fg, bg)
     }
 }
 
 impl From<String> for Text {
     fn from(s: String) -> Text {
-        Text::new(s, None)
+        Text::new(s, None, None)
     }
 }
 
@@ -29,7 +29,7 @@ impl Widget for Text {
             .split('\n')
             .enumerate()
             .flat_map(|(y, line)| line.chars().enumerate().map(move |(x, c)| (y as u16, x as u16, c)))
-            .map(|(y, x, c)| Pixel::new(c, ScreenPos::new(x, y), self.1))
+            .map(|(y, x, c)| Pixel::new(c, ScreenPos::new(x, y), self.1, self.2))
             .collect()
     }
 }
@@ -39,7 +39,8 @@ impl Widget for Text {
 // -----------------------------------------------------------------------------
 pub struct Border {
     s: String,
-    color: Option<Color>,
+    fg_color: Option<Color>,
+    bg_color: Option<Color>,
 }
 
 impl Border {
@@ -54,9 +55,9 @@ impl Border {
     /// H      D
     /// GFFFFFFE
     /// ```
-    pub fn new(s: String, color: Option<Color>) -> Self {
+    pub fn new(s: String, fg_color: Option<Color>, bg_color: Option<Color>) -> Self {
         debug_assert!(s.chars().count() >= 8);
-        Self { s, color }
+        Self { s, fg_color, bg_color }
     }
 }
 
@@ -75,31 +76,31 @@ impl Widget for Border {
 
         let mut sides = (1..size.height - 1) // Left
             .into_iter()
-            .map(|y| Pixel::new(left, ScreenPos::new(0, y), self.color))
+            .map(|y| Pixel::new(left, ScreenPos::new(0, y), self.fg_color, self.bg_color))
             .collect::<Vec<_>>();
 
         sides.append(&mut (1..size.height - 1) // Right
             .into_iter()
-            .map(|y| Pixel::new(right, ScreenPos::new(0 + size.width - 1, y), self.color))
+            .map(|y| Pixel::new(right, ScreenPos::new(0 + size.width - 1, y), self.fg_color, self.bg_color))
             .collect::<Vec<_>>());
 
         let mut top = (1..size.width - 1)
             .into_iter()
-            .map(|x| Pixel::new(top, ScreenPos::new(x, 0), self.color))
+            .map(|x| Pixel::new(top, ScreenPos::new(x, 0), self.fg_color, self.bg_color))
             .collect::<Vec<_>>();
 
         top.append(&mut (1..size.width - 1) // Bottom
             .into_iter()
-            .map(|x| Pixel::new(bot, ScreenPos::new(x, size.height - 1), self.color))
+            .map(|x| Pixel::new(bot, ScreenPos::new(x, size.height - 1), self.fg_color, self.bg_color))
             .collect::<Vec<_>>());
 
         top.append(&mut sides);
 
         // Corners
-        top.push(Pixel::new(top_left, ScreenPos::zero(), self.color));
-        top.push(Pixel::new(top_right, ScreenPos::new(size.width - 1, 0), self.color));
-        top.push(Pixel::new(bot_right, ScreenPos::new(size.width - 1, size.height - 1), self.color));
-        top.push(Pixel::new(bot_left, ScreenPos::new(0, size.height - 1), self.color));
+        top.push(Pixel::new(top_left, ScreenPos::zero(), self.fg_color, self.bg_color));
+        top.push(Pixel::new(top_right, ScreenPos::new(size.width - 1, 0), self.fg_color, self.bg_color));
+        top.push(Pixel::new(bot_right, ScreenPos::new(size.width - 1, size.height - 1), self.fg_color, self.bg_color));
+        top.push(Pixel::new(bot_left, ScreenPos::new(0, size.height - 1), self.fg_color, self.bg_color));
 
         top
     }

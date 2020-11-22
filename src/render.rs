@@ -1,7 +1,7 @@
 use std::io::{self, Stdout, Write};
 
 use crossterm::cursor::{self, MoveTo};
-use crossterm::style::{ResetColor, SetForegroundColor};
+use crossterm::style::{SetForegroundColor, SetBackgroundColor};
 
 #[cfg(target_os = "windows")]
 use crossterm::event::EnableMouseCapture;
@@ -76,7 +76,8 @@ pub trait RenderTarget {
 /// Render to stdout
 pub struct StdoutTarget {
     stdout: Stdout,
-    last_color: Option<Color>,
+    last_color_fg: Option<Color>,
+    last_color_bg: Option<Color>,
 }
 
 impl StdoutTarget {
@@ -87,7 +88,8 @@ impl StdoutTarget {
         let stdout = raw_mode()?;
         Ok(Self {
             stdout,
-            last_color: None,
+            last_color_fg: None,
+            last_color_bg: None,
         })
     }
 }
@@ -99,11 +101,19 @@ impl RenderTarget for StdoutTarget {
                 .queue(MoveTo(pixel.pos.x, pixel.pos.y))
                 .expect("failed to move cursor");
 
-            if self.last_color != pixel.color {
-                self.last_color = pixel.color;
-                let _ = match self.last_color {
+            if self.last_color_fg != pixel.fg_color {
+                self.last_color_fg = pixel.fg_color;
+                let _ = match self.last_color_fg {
                     Some(color) => self.stdout.queue(SetForegroundColor(color)),
-                    None => self.stdout.queue(ResetColor),
+                    None => self.stdout.queue(SetForegroundColor(Color::Reset)),
+                };
+            }
+
+            if self.last_color_bg != pixel.bg_color {
+                self.last_color_bg = pixel.bg_color;
+                let _ = match self.last_color_bg {
+                    Some(color) => self.stdout.queue(SetBackgroundColor(color)),
+                    None => self.stdout.queue(SetBackgroundColor(Color::Reset)),
                 };
             }
 

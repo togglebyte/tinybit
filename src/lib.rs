@@ -66,20 +66,22 @@ pub mod widgets;
 pub struct Pixel {
     glyph: char,
     pos: ScreenPos,
-    color: Option<Color>,
+    fg_color: Option<Color>,
+    bg_color: Option<Color>,
 }
 
 impl Pixel {
-    pub fn new(glyph: char, pos: ScreenPos, color: Option<Color>) -> Self {
+    pub fn new(glyph: char, pos: ScreenPos, fg_color: Option<Color>, bg_color: Option<Color>) -> Self {
         Self {
             glyph,
             pos,
-            color,
+            fg_color,
+            bg_color,
         }
     } 
 
     pub fn white(c: char, pos: ScreenPos) -> Self {
-        Self::new(c, pos, None)
+        Self::new(c, pos, None, None)
     }
 }
 
