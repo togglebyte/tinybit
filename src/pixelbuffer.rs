@@ -1,4 +1,4 @@
-use crate::{ScreenPos, ScreenSize, Pixel};
+use crate::{Pixel, ScreenPos, ScreenSize};
 
 /// Character buffer holds all the "pixels" to be drawn on the screen
 #[derive(Debug)]
@@ -14,10 +14,7 @@ impl PixelBuffer {
     pub fn new(size: ScreenSize) -> Self {
         let cap = (size.width * size.height) as usize;
         let pixels = vec![None; cap];
-        Self {
-            pixels,
-            size,
-        }
+        Self { pixels, size }
     }
 
     /// Convert index to x y coordinates
@@ -39,7 +36,10 @@ impl PixelBuffer {
     pub(crate) fn set_pixel(&mut self, pixel: Pixel) {
         let index = (self.size.width * pixel.pos.y + pixel.pos.x) as usize;
         if let Some(Some(existing_pixel)) = self.pixels.get(index) {
-            if existing_pixel.glyph == pixel.glyph {
+            if existing_pixel.glyph == pixel.glyph
+                && existing_pixel.fg_color == pixel.fg_color
+                && existing_pixel.bg_color == pixel.bg_color
+            {
                 return;
             }
         }

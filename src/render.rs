@@ -101,6 +101,8 @@ impl RenderTarget for StdoutTarget {
                 .queue(MoveTo(pixel.pos.x, pixel.pos.y))
                 .expect("failed to move cursor");
 
+            // Set the foreground colour if the colour is different
+            // than the last colour used
             if self.last_color_fg != pixel.fg_color {
                 self.last_color_fg = pixel.fg_color;
                 let _ = match self.last_color_fg {
@@ -109,6 +111,8 @@ impl RenderTarget for StdoutTarget {
                 };
             }
 
+            // Set the background colour if the colour is different
+            // than the last colour used
             if self.last_color_bg != pixel.bg_color {
                 self.last_color_bg = pixel.bg_color;
                 let _ = match self.last_color_bg {

@@ -49,7 +49,7 @@ impl Viewport {
     }
 
     /// Draw a widget with an offset in the viewport.
-    pub fn draw_widget(&mut self, widget: impl Widget, offset: ScreenPos) {
+    pub fn draw_widget(&mut self, widget: &impl Widget, offset: ScreenPos) {
         widget.pixels(self.size).into_iter().for_each(|mut p| {
             p.pos.x += offset.x;
             p.pos.y += offset.y;

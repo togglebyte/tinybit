@@ -93,7 +93,7 @@ pub use pixelbuffer::PixelBuffer;
 pub use crossterm::terminal::size as term_size;
 pub use render::{Renderer, StdoutTarget};
 pub use viewport::Viewport;
-pub use crossterm::style::Color;
+pub use crossterm::style::{Colored, Color};
 
 // -----------------------------------------------------------------------------
 //     - Euclid -
