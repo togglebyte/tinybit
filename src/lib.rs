@@ -64,10 +64,10 @@ pub mod widgets;
 /// A character at a position, with a colour
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Pixel {
-    glyph: char,
-    pos: ScreenPos,
-    fg_color: Option<Color>,
-    bg_color: Option<Color>,
+    pub glyph: char,
+    pub pos: ScreenPos,
+    pub fg_color: Option<Color>,
+    pub bg_color: Option<Color>,
 }
 
 impl Pixel {
