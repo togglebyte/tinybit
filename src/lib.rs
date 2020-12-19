@@ -1,7 +1,7 @@
 // #![deny(missing_docs)]
 //! Terminal game engine
 //! ```
-//! # use tinybit::events::{events, Event, KeyCode, KeyEvent};
+//! # use tinybit::events::{events, Event, KeyCode, KeyEvent, EventModel};
 //! # use tinybit::{
 //! #     term_size, Camera, Renderer, ScreenPos, ScreenSize, StdoutTarget, Viewport,
 //! #     WorldPos, WorldSize, Pixel
@@ -27,10 +27,10 @@
 //!     // Player
 //!     let mut player = ('@', camera_pos);
 //! 
-//!     for event in events(20) {
+//!     for event in events(EventModel::Fps(20)) {
 //!         match event {
 //!             Event::Tick => {
-//!                 let pixel = Pixel::new(player.0, camera.to_screen(player.1), None);
+//!                 let pixel = Pixel::new(player.0, camera.to_screen(player.1), None, None);
 //!                 viewport.draw_pixel(pixel);
 //!                 let _ = renderer.render(&mut viewport);
 //! #               break

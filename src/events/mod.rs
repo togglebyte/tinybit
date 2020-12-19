@@ -2,9 +2,8 @@
 //!
 //! ```
 //! # use tinybit::*;
-//! # use tinybit::events::Event;
-//! let fps = 20;
-//! for event in events::events(fps) {
+//! # use tinybit::events::{Event, EventModel};
+//! for event in events::events(EventModel::Fps(20)) {
 //!     match event {
 //!         Event::Tick => {
 //! #          break
@@ -51,13 +50,21 @@ impl Iterator for Events {
     }
 }
 
+/// The type of events to listen for.
+pub enum EventModel {
+    /// Generate a tick every N milliseconds
+    Fps(u64),
+    /// Block until an event is raised
+    Blocking
+}
+
 /// Produce events.
 ///
 /// ```
 /// # use tinybit::*;
-/// # use tinybit::events::Event;
-/// let fps = 20;
-/// for event in events::events(fps) {
+/// # use tinybit::events::{Event, EventModel};
+/// let model = EventModel::Fps(20);
+/// for event in events::events(model) {
 ///     match event {
 ///         Event::Tick => {
 /// #          break
@@ -66,7 +73,7 @@ impl Iterator for Events {
 ///     }
 /// }
 /// ```
-pub fn events(fps: u64) -> Events {
+pub fn events(event_model: EventModel) -> Events {
     let (tx, rx) = mpsc::channel();
 
     // Input events
@@ -85,11 +92,13 @@ pub fn events(fps: u64) -> Events {
         }
     });
 
-    // Frames
-    thread::spawn(move || loop {
-        let _ = tx.send(Event::Tick);
-        thread::sleep(Duration::from_millis(1000 / fps));
-    });
+    if let EventModel::Fps(fps) = event_model {
+        // Frames
+        thread::spawn(move || loop {
+            let _ = tx.send(Event::Tick);
+            thread::sleep(Duration::from_millis(1000 / fps));
+        });
+    }
 
     Events { rx }
 }

@@ -178,14 +178,14 @@ mod test {
         let min_y = cam.bounding_box.min_y();
 
         let a = ('A', WorldPos::new(min_x, min_y));
-        let a = Pixel::new(a.0, cam.to_screen(a.1), None);
+        let a = Pixel::new(a.0, cam.to_screen(a.1), None, None);
 
         view.draw_pixel(a);
         let mut renderer = Renderer::new(DummyTarget { pixels: Vec::new() });
 
         renderer.render(&mut view);
 
-        let a = Pixel::new('A', ScreenPos::new(2, 2), None); // 2, 2 because of the viewport offset
+        let a = Pixel::new('A', ScreenPos::new(2, 2), None, None); // 2, 2 because of the viewport offset
         let pixels = vec![a];
         assert_eq!(pixels, renderer.target.pixels);
     }

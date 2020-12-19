@@ -135,15 +135,15 @@ mod test {
         let pixels = positions
             .into_iter()
             .zip(glyphs)
-            .map(|(p, g)| Pixel::new(g, cam.to_screen(p), None))
+            .map(|(p, g)| Pixel::new(g, cam.to_screen(p), None, None))
             .collect::<Vec<_>>();
 
         view.draw_pixels(pixels);
 
-        let a = Pixel::new('A', ScreenPos::new(2, 2), None);
-        let b = Pixel::new('B', ScreenPos::new(7, 2), None);
-        let c = Pixel::new('C', ScreenPos::new(2, 7), None);
-        let d = Pixel::new('D', ScreenPos::new(7, 7), None);
+        let a = Pixel::new('A', ScreenPos::new(2, 2), None, None);
+        let b = Pixel::new('B', ScreenPos::new(7, 2), None, None);
+        let c = Pixel::new('C', ScreenPos::new(2, 7), None, None);
+        let d = Pixel::new('D', ScreenPos::new(7, 7), None, None);
 
         let drawn_pixels = view.pixels();
 
