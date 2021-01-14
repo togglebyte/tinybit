@@ -48,7 +48,7 @@ impl Border {
     /// from the top left corner, going clockwise.
     ///
     /// ```text
-    /// // Border::new("ABCDEFGH" None) 
+    /// // Border::new("ABCDEFGH" None, None)
     ///
     /// ABBBBBBC
     /// H      D

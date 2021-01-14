@@ -27,7 +27,9 @@ impl Viewport {
         }
     }
 
-    /// Resize the viewport
+    /// Resize the viewport.
+    /// Remember to clear the renderer or residual
+    /// characters might remain.
     pub fn resize(&mut self, width: u16, height: u16) {
         self.size = ScreenSize::new(width, height);
         self.new_buf = PixelBuffer::new(self.size);
