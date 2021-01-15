@@ -1,3 +1,8 @@
+//! A collection of widgets.
+//!
+//! ```
+//! let text = Text::new("Hello, World", None, None);
+//! ```
 use crossterm::style::Color;
 
 use crate::{Pixel, ScreenPos, ScreenSize};
@@ -9,11 +14,13 @@ pub trait Widget {
 // -----------------------------------------------------------------------------
 //     - Text -
 // -----------------------------------------------------------------------------
+/// Render a text string as a specified location.
 pub struct Text(pub String, pub Option<Color>, pub Option<Color>);
 
 impl Text {
-    pub fn new(s: String, fg: Option<Color>, bg: Option<Color>) -> Self {
-        Self(s, fg, bg)
+    /// Make a new text widget.
+    pub fn new(s: impl Into<String>, fg: Option<Color>, bg: Option<Color>) -> Self {
+        Self(s.into(), fg, bg)
     }
 }
 
@@ -37,6 +44,8 @@ impl Widget for Text {
 // -----------------------------------------------------------------------------
 //     - Border -
 // -----------------------------------------------------------------------------
+/// Render a border.
+/// See the `new` function for more details.
 pub struct Border {
     s: String,
     fg_color: Option<Color>,

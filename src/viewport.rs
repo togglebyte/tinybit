@@ -44,6 +44,10 @@ impl Viewport {
         });
     }
 
+    /// Draw a single pixel onto the rendereable surface layers.
+    /// This is called from `draw_pixels` for each pixel.
+    ///
+    /// This is useful if it's desired to draw just one pixel.
     pub fn draw_pixel(&mut self, pixel: Pixel) {
         if self.in_view(pixel.pos) {
             self.new_buf.set_pixel(pixel);

@@ -18,7 +18,7 @@ use std::time::Duration;
 
 use crossterm::event::{read, Event as CrossTermEvent};
 
-pub use crossterm::event::{KeyCode, KeyEvent};
+pub use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 type Rx = Receiver<Event>;
 
