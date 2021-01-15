@@ -5,7 +5,7 @@
 //! let text = Text::new("Hello, World", None, None);
 //! ```
 use crate::{Color, Pixel, ScreenPos, ScreenSize};
-use crate::events::{Event, KeyCode, KeyEvent};
+use crate::events::{KeyCode, KeyEvent};
 
 pub trait Widget {
     fn pixels(&self, size: ScreenSize) -> Vec<Pixel>;
@@ -118,8 +118,7 @@ impl Widget for Border {
 // -----------------------------------------------------------------------------
 //     - Text widget -
 // -----------------------------------------------------------------------------
-
-
+/// A text input field.
 pub struct TextField {
     pub text: String,
     pub password: bool,
@@ -133,6 +132,7 @@ pub struct TextField {
 }
 
 impl TextField {
+    /// Construct a new instance of an input.
     pub fn new(fg_color: Option<Color>, bg_color: Option<Color>) -> Self {
         Self {
             text: String::new(),
@@ -147,27 +147,32 @@ impl TextField {
         }
     }
 
+    /// Clear the input and place the cursor
+    /// at the start.
     pub fn clear(&mut self) {
         self.text.clear();
         self.cursor = 0;
     }
 
+    /// Remove focus from the input.
+    /// This hides the cursor.
     pub fn unfocus(&mut self) {
         self.focus = false;
         self.cursor = self.text.chars().count();
     }
 
-    pub fn event(&mut self, event: Event) {
+    /// Pass a `KeyEvent` to the input to build
+    /// up the text value.
+    ///
+    /// This can be accessed through the `text` field.
+    pub fn event(&mut self, event: KeyEvent) {
         if !self.focus || !self.enabled {
             return;
         }
 
-        let key_code = match event {
-            Event::Key(KeyEvent { code: k, .. }) => k,
-            _ => return,
-        };
+        let KeyEvent { code, .. } = event;
 
-        match key_code {
+        match code {
             KeyCode::Left if self.cursor > 0 => {
                 self.cursor -= 1;
             }
@@ -179,6 +184,9 @@ impl TextField {
                 self.text.remove(self.cursor);
             }
             KeyCode::Delete if self.text.len() > 0 => {
+                if self.text.len() <= self.cursor {
+                    return;
+                }
                 self.text.remove(self.cursor);
                 if self.cursor > self.text.len() {
                     self.cursor = self.text.len();
