@@ -130,7 +130,7 @@ impl RenderTarget for StdoutTarget {
     }
 
     fn clear(&mut self) {
-        let _ = self.stdout.queue(Clear(ClearType::All));
+        let _ = self.stdout.execute(Clear(ClearType::All));
     }
 }
 
