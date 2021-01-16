@@ -110,7 +110,7 @@ mod test {
     use super::*;
     use crate::*;
 
-    fn camera(viewport: &Viewport) -> Camera {
+    fn camera(viewport: &Viewport) -> Camera<camera::NoLimit> {
         let pos = WorldPos::new(30.0, 30.0);
         Camera::from_viewport(pos, viewport)
     }

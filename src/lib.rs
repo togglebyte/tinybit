@@ -53,11 +53,11 @@
 
 use serde::{Serialize, Deserialize};
 
-mod camera;
 mod pixelbuffer;
 mod render;
 mod viewport;
 
+pub mod camera;
 pub mod events;
 pub mod widgets;
 

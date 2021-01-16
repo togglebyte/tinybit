@@ -1,49 +1,28 @@
 use crate::{ScreenPos, Viewport, WorldPos, WorldRect, WorldSize};
 
-struct Limit {
+pub struct Limit {
     top: f32,
     right: f32,
     bottom: f32,
     left: f32,
 }
 
+pub struct NoLimit;
+
 /// Camera
-pub struct Camera {
+pub struct Camera<T> {
     /// Global position
     pub position: WorldPos,
 
     size: WorldSize,
     pub(crate) bounding_box: WorldRect,
-    limit: Option<Limit>,
+    limit: T,
 }
 
-impl Camera {
-    /// Create a new camera at a specific world position, with a fixed
-    /// size.
-    // pub fn from_viewport(position: WorldPos, size: WorldSize) -> Self {
-    pub fn from_viewport(position: WorldPos, viewport: &Viewport) -> Self {
-        let size = WorldSize::new(viewport.size.width as f32, viewport.size.height as f32);
-        Self::new(position, size)
-    }
-
+impl<T> Camera<T> {
     /// Resize the camera
     pub fn resize(&mut self, width: u16, height: u16) {
         self.size = WorldSize::new(width as f32, height as f32);
-    }
-
-    /// Create a new camera
-    pub fn new(position: WorldPos, size: WorldSize) -> Self {
-        let bounding_box = WorldRect::new(
-            WorldPos::new(position.x - size.width / 2.0, position.y - size.height / 2.0),
-            size,
-        );
-
-        Self {
-            position,
-            size,
-            bounding_box,
-            limit: None,
-        }
     }
 
     /// Convert a point to local space.
@@ -52,25 +31,6 @@ impl Camera {
         let min_y = self.bounding_box.min_y();
 
         ScreenPos::new((pos.x - min_x) as u16, (pos.y - min_y) as u16)
-    }
-
-    /// The limit is used for tracking. For more information see `tracking`.
-    /// given a limit of 1, 1, 1, 1, `c` represents the centre:
-    ///
-    /// ```text
-    /// [ ] [ ] [ ] [ ] [ ]
-    /// [ ] [x] [x] [x] [ ]
-    /// [ ] [x] [c] [x] [ ]
-    /// [ ] [x] [x] [x] [ ]
-    /// [ ] [ ] [ ] [ ] [ ]
-    /// ```
-    pub fn set_limit(&mut self, top: u16, right: u16, bottom: u16, left: u16) {
-        self.limit = Some(Limit {
-            top: top as f32,
-            right: right as f32,
-            bottom: bottom as f32,
-            left: left as f32,
-        });
     }
 
     /// Move the camera to a new position in global space
@@ -91,25 +51,69 @@ impl Camera {
         );
     }
 
+}
+
+impl Camera<NoLimit> {
+    /// Create a new camera at a specific world position, with a fixed size.
+    pub fn from_viewport(position: WorldPos, viewport: &Viewport) -> Camera<NoLimit> {
+        let size = WorldSize::new(viewport.size.width as f32, viewport.size.height as f32);
+        Self::new(position, size)
+    }
+
+    /// Create a new camera
+    pub fn new(position: WorldPos, size: WorldSize) -> Camera<NoLimit> {
+        let bounding_box = WorldRect::new(
+            WorldPos::new(position.x - size.width / 2.0, position.y - size.height / 2.0),
+            size,
+        );
+
+        Self {
+            position,
+            size,
+            bounding_box,
+            limit: NoLimit,
+        }
+    }
+
+    /// The limit is used for tracking. For more information see `tracking`.
+    /// given a limit of 1, 1, 1, 1, `c` represents the centre:
+    ///
+    /// ```text
+    /// [ ] [ ] [ ] [ ] [ ]
+    /// [ ] [x] [x] [x] [ ]
+    /// [ ] [x] [c] [x] [ ]
+    /// [ ] [x] [x] [x] [ ]
+    /// [ ] [ ] [ ] [ ] [ ]
+    /// ```
+    pub fn with_limit(self, top: u16, right: u16, bottom: u16, left: u16) -> Camera<Limit> {
+        Camera {
+            limit: Limit {
+                top: top as f32,
+                right: right as f32,
+                bottom: bottom as f32,
+                left: left as f32,
+            },
+            position: self.position,
+            bounding_box: self.bounding_box,
+            size: self.size,
+        }
+    }
+}
+impl Camera<Limit> {
     /// Move the camera if the target is outside of the camera's `limit` box
     pub fn track(&mut self, pos: WorldPos) {
-        let limit = match self.limit {
-            Some(ref l) => l,
-            None => return,
-        };
-
-        let x = if pos.x >= self.position.x + limit.left {
-            pos.x - limit.left
-        } else if pos.x <= self.position.x - limit.right {
-            pos.x + limit.right
+        let x = if pos.x >= self.position.x + self.limit.left {
+            pos.x - self.limit.left
+        } else if pos.x <= self.position.x - self.limit.right {
+            pos.x + self.limit.right
         } else {
             self.position.x
         };
 
-        let y = if pos.y >= self.position.y + limit.top {
-            pos.y - limit.top
-        } else if pos.y <= self.position.y - limit.bottom {
-            pos.y + limit.bottom
+        let y = if pos.y >= self.position.y + self.limit.top {
+            pos.y - self.limit.top
+        } else if pos.y <= self.position.y - self.limit.bottom {
+            pos.y + self.limit.bottom
         } else {
             self.position.y
         };
@@ -122,7 +126,7 @@ impl Camera {
 mod test {
     use super::*;
 
-    fn camera() -> Camera {
+    fn camera() -> Camera<NoLimit> {
         let pos = WorldPos::new(3.0, 3.0);
         let size = WorldSize::new(6.0, 6.0);
         Camera::new(pos, size)
@@ -147,7 +151,7 @@ mod test {
     fn track_point() {
         let mut cam = camera();
         cam.move_to(WorldPos::new(100.0, 100.0));
-        cam.set_limit(2, 2, 2, 2);
+        let mut cam = cam.with_limit(2, 2, 2, 2);
 
         let cam_pos = cam.position;
 

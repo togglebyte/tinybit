@@ -145,7 +145,7 @@ mod test {
     use super::*;
     use crate::*;
 
-    fn camera() -> Camera {
+    fn camera() -> Camera<camera::NoLimit> {
         let pos = WorldPos::new(30.0, 30.0);
         let size = WorldSize::new(6.0, 6.0);
         Camera::new(pos, size)
