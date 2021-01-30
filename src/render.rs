@@ -136,6 +136,7 @@ impl RenderTarget for StdoutTarget {
 
 impl Drop for StdoutTarget {
     fn drop(&mut self) {
+        let _ = self.stdout.execute(cursor::Show);
         let _ = disable_raw_mode();
     }
 }
