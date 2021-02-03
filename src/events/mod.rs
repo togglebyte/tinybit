@@ -24,14 +24,13 @@ type Rx = Receiver<Event>;
 
 /// Event. Either a tick event or a key press event
 /// TODO: add resize event
-#[derive(Debug, Clone, Copy)] 
+#[derive(Debug, Clone, Copy)]
 pub enum Event {
     /// Generated for every frame
     Tick,
 
     /// A key press
     Key(KeyEvent),
-
 
     /// Terminal resize event
     Resize(u16, u16),
@@ -40,13 +39,18 @@ pub enum Event {
 /// Events producer
 pub struct Events {
     rx: Rx,
+    blocking: bool,
 }
 
 impl Iterator for Events {
     type Item = Event;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.rx.recv().ok()
+        if self.blocking {
+            self.rx.recv().ok()
+        } else {
+            self.rx.try_recv().ok()
+        }
     }
 }
 
@@ -55,7 +59,9 @@ pub enum EventModel {
     /// Generate a tick every N milliseconds
     Fps(u64),
     /// Block until an event is raised
-    Blocking
+    Blocking,
+    /// Non blocking
+    NonBlocking,
 }
 
 /// Produce events.
@@ -100,5 +106,10 @@ pub fn events(event_model: EventModel) -> Events {
         });
     }
 
-    Events { rx }
+    let blocking = match event_model {
+        EventModel::NonBlocking => false,
+        _ => true,
+    };
+
+    Events { rx, blocking }
 }
