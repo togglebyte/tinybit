@@ -1,7 +1,7 @@
 use std::io::{self, Stdout, Write};
 
 use crossterm::cursor::{self, MoveTo};
-use crossterm::style::{SetForegroundColor, SetBackgroundColor};
+use crossterm::style::{SetBackgroundColor, SetForegroundColor};
 
 #[cfg(target_os = "windows")]
 use crossterm::event::EnableMouseCapture;
@@ -73,6 +73,9 @@ pub trait RenderTarget {
     fn clear(&mut self);
 }
 
+// -----------------------------------------------------------------------------
+//     - Stdout render target -
+// -----------------------------------------------------------------------------
 /// Render to stdout
 pub struct StdoutTarget {
     stdout: Stdout,
@@ -139,6 +142,17 @@ impl Drop for StdoutTarget {
         let _ = self.stdout.execute(cursor::Show);
         let _ = disable_raw_mode();
     }
+}
+
+// -----------------------------------------------------------------------------
+//     - Dummy render target -
+// -----------------------------------------------------------------------------
+/// A dummy render target.
+pub struct DummyTarget;
+
+impl RenderTarget for DummyTarget {
+    fn render(&mut self, pixels: Vec<Pixel>) {}
+    fn clear(&mut self) {}
 }
 
 #[cfg(test)]

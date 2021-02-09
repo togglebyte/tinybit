@@ -54,9 +54,9 @@
 use serde::{Serialize, Deserialize};
 
 mod pixelbuffer;
-mod render;
 mod viewport;
 
+pub mod render;
 pub mod camera;
 pub mod events;
 pub mod widgets;
