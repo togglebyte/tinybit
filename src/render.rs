@@ -151,7 +151,7 @@ impl Drop for StdoutTarget {
 pub struct DummyTarget;
 
 impl RenderTarget for DummyTarget {
-    fn render(&mut self, pixels: Vec<Pixel>) {}
+    fn render(&mut self, _pixels: Vec<Pixel>) {}
     fn clear(&mut self) {}
 }
 
