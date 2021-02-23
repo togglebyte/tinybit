@@ -23,7 +23,7 @@ fn raw_mode() -> Result<Stdout> {
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     // we enable mouse capture because:
-    // 1) DisableMouseCapture doesn't work on windows without enabling it first
+    // 1) DisableMouseCapture doesn't work on windows.
     // 2) it allows to add mouse support later if needed
     //
     // ! if you want to disable mouse capture, be sure to enable it first,
