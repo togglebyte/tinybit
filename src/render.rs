@@ -27,7 +27,7 @@ fn setup_terminal_for_stdout_target() -> Result<Stdout> {
     stdout.execute(EnterAlternateScreen)?;
 
     // we enable mouse capture because:
-    // 1) DisableMouseCapture doesn't work on windows without enabling it first
+    // 1) DisableMouseCapture doesn't work on windows.
     // 2) it allows to add mouse support later if needed
     //
     // ! if you want to disable mouse capture, be sure to enable it first,
