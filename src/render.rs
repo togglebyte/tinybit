@@ -10,18 +10,22 @@ use crossterm::event::EnableMouseCapture;
 use crossterm::event::DisableMouseCapture;
 
 use crossterm::style::Print;
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
+use crossterm::terminal::{
+    disable_raw_mode, enable_raw_mode, Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen,
+};
 use crossterm::QueueableCommand;
 use crossterm::{execute, ExecutableCommand, Result};
 
 use crate::{Color, Pixel, Viewport};
 
 // -----------------------------------------------------------------------------
-//     - Raw mode -
+//     - Setup terminal for stdout target -
 // -----------------------------------------------------------------------------
-fn raw_mode() -> Result<Stdout> {
+fn setup_terminal_for_stdout_target() -> Result<Stdout> {
     enable_raw_mode()?;
     let mut stdout = io::stdout();
+    stdout.execute(EnterAlternateScreen)?;
+
     // we enable mouse capture because:
     // 1) DisableMouseCapture doesn't work on windows.
     // 2) it allows to add mouse support later if needed
@@ -37,6 +41,20 @@ fn raw_mode() -> Result<Stdout> {
     stdout.execute(cursor::Hide)?;
     stdout.execute(Clear(ClearType::All))?;
     Ok(stdout)
+}
+
+// -----------------------------------------------------------------------------
+//     - Reset terminal from stdout target -
+// -----------------------------------------------------------------------------
+fn reset_terminal_from_stdout_target(stdout: &mut Stdout) -> Result<()> {
+    // Do we need to show the cursor too, or does that get handled
+    // automatically by crossterm?
+
+    stdout.execute(cursor::Show)?;
+    stdout.execute(LeaveAlternateScreen)?;
+    disable_raw_mode()?;
+
+    Ok(())
 }
 
 // -----------------------------------------------------------------------------
@@ -85,10 +103,15 @@ pub struct StdoutTarget {
 
 impl StdoutTarget {
     /// Create a new stdout target.
-    /// This sets stdout into raw mode.
-    /// Once this is dropped it will disable raw mode.
+    /// This sets up the terminal so tinybit can draw on it. That includes:
+    /// * Enabling raw mode
+    /// * Entering an alternate screen
+    /// * Hiding the cursor
+    /// * Clearing the screen
+    ///
+    /// Once this is dropped it will reset all these settings.
     pub fn new() -> Result<Self> {
-        let stdout = raw_mode()?;
+        let stdout = setup_terminal_for_stdout_target()?;
         Ok(Self {
             stdout,
             last_color_fg: None,
@@ -139,8 +162,7 @@ impl RenderTarget for StdoutTarget {
 
 impl Drop for StdoutTarget {
     fn drop(&mut self) {
-        let _ = self.stdout.execute(cursor::Show);
-        let _ = disable_raw_mode();
+        let _ = reset_terminal_from_stdout_target(&mut self.stdout);
     }
 }
 
