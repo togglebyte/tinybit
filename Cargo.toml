@@ -1,6 +1,6 @@
 [package]
 name = "tinybit"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Togglebit <me@togglebit.io>"]
 edition = "2018"
 description = "terminal game framework"
