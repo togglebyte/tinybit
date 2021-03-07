@@ -94,6 +94,7 @@ pub use crossterm::terminal::size as term_size;
 pub use render::{Renderer, StdoutTarget};
 pub use viewport::Viewport;
 pub use crossterm::style::{Colored, Color};
+pub use crossterm::ErrorKind as CrosstermError;
 
 // -----------------------------------------------------------------------------
 //     - Euclid -
