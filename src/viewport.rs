@@ -6,7 +6,7 @@ use crate::{Pixel, PixelBuffer, ScreenPos, ScreenSize};
 /// Represents a drawable area on screen.
 pub struct Viewport {
     /// The viewport's position on screen.
-    /// Where 0.0,0 is the top left corner
+    /// Where 0,0 is the top left corner
     pub position: ScreenPos,
 
     /// The size of the viewport. Should probably match the size of the camera
